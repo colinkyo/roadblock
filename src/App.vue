@@ -144,12 +144,23 @@
         </van-button>
       </div>
     </van-form>
-    <van-row justify="center">
-      <van-col span="24">
+    <van-row>
+      <van-col span="2">
         <div style="padding-left: 16px">
           <van-button type="danger" class="btn" id="btn" @click="copysql"
             >复制生成的SQL</van-button
           >
+        </div></van-col
+      >
+      <van-col span="2"
+        ><van-button type="success" class="btn" id="btn" @click="saveAsText"
+          >保存生成的SQL</van-button
+        >
+      </van-col>
+    </van-row>
+    <van-row justify="center">
+      <van-col span="24">
+        <div style="padding-left: 16px">
           <div id="bar" v-html="textsql"></div>
         </div>
       </van-col>
@@ -179,6 +190,8 @@ import { MAPVERSION, DEFAULTVALUE } from './config/config'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import isBetween from 'dayjs/plugin/isBetween'
+
+import { saveAs } from 'file-saver'
 
 dayjs.extend(utc)
 
@@ -374,9 +387,15 @@ export default defineComponent({
       Toast.success('生成SQL成功.')
       //textsql.value = textsql.value.replace('<br/>', '\\n\\r')
     }
+    const saveAsText = () => {
+      const str = textsql.value.replace(/<br\/>/g, '\r\n')
+      const strData = new Blob([str], { type: 'text/plain;charset=utf-8' })
+      saveAs(strData, '测试文件下载.sql')
+    }
+
     const createoncesqltpl = (sdate: string, edate: string) => {
       const sqltpl = ref(
-        `insert into tec_geo_prepare(heading_zh,heading_en,content_zh,content_en,type_code,cause_code,source_id,shown_now,announcement_time,road_version,created_at,updated_at,start_time,end_time) values("#heading_zh#","#heading_en#","#content_zh#","#content_en#",#type_code#,#cause_code#,#source_id#,#shown_now#,#announcement_time#,"#road_version#",#created_at#,#updated_at#,#start_time#,#end_time#);<br/>`
+        `insert into tec_geo_prepare(heading_zh,heading_en,content_zh,content_en,type_code,cause_code,source_id,shown_now,announcement_time,road_version,created_at,updated_at,start_time,end_time) values("#heading_zh#","#heading_en#","#content_zh#","#content_en#",#type_code#,#cause_code#,#source_id#,#shown_now#,timestamp "#announcement_time#","#road_version#",timestamp "#created_at#",timestamp "#updated_at#,#start_time#",timestamp "#end_time#");<br/>`
       )
       const extversion = ref()
 
@@ -482,7 +501,8 @@ export default defineComponent({
       clearexdate,
       cleardate,
       createsql,
-      copysql
+      copysql,
+      saveAsText
     }
   }
 })
