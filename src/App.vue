@@ -6,7 +6,7 @@
           <van-cell-group>
             <van-field name="radio" label="地区选择">
               <template #input>
-                <van-radio-group v-model="radiochecked" direction="horizontal">
+                <van-radio-group v-model="zoneradio" direction="horizontal">
                   <van-radio name="HK">香港</van-radio>
                   <van-radio name="MO">澳门</van-radio>
                 </van-radio-group>
@@ -26,6 +26,7 @@
               v-model="heading_en"
             ></van-field>
             <van-field
+              autocomplete="off"
               label="中文内容"
               placeholder="中文内容"
               :clearable="true"
@@ -33,6 +34,7 @@
               :rules="[{ required: true, message: '请填写中文内容' }]"
             ></van-field>
             <van-field
+              autocomplete="off"
               label="英文内容"
               placeholder="英文内容"
               :clearable="true"
@@ -41,126 +43,186 @@
           </van-cell-group>
         </van-col>
       </van-row>
-      <van-row justify="center" gutter="10">
+      <van-row>
         <van-col span="6">
-          <van-popover v-model:show="showPopover" placement="bottom-start">
+          <van-popover v-model:show="showsDatePopup" placement="bottom-start">
             <van-calendar
-              ref="dateref"
-              type="range"
+              ref="datesref"
               first-day-of-week="1"
               :allow-same-day="true"
               title="日历"
               :poppable="false"
-              @confirm="onConfirm"
-              :style="{ height: '400px', width: '500' }"
+              @confirm="onsDateConfirm"
+              :style="{ height: '400px', width: '400px' }"
             />
             <template #reference>
               <van-field
+                autocomplete="off"
                 :clearable="true"
-                label="选择日期"
-                placeholder="选择日期"
-                title="选择日期"
-                v-model="date"
-                @clear="cleardate"
-                :rules="[{ required: true, message: '选择日期' }]"
+                label="开始日期"
+                placeholder="年-月-日"
+                title="开始日期"
+                v-model="sdate"
+                @clear="clearedate"
+                @update:model-value="sdateupdate"
+                :rules="[{ required: true, message: '选择开始日期' }]"
               ></van-field>
             </template>
           </van-popover>
         </van-col>
-        <van-col span="3"
-          ><van-popover v-model:show="showsTime" placement="bottom">
+        <van-col span="6"
+          ><van-popover v-model:show="showsTimePopup" placement="bottom">
             <van-datetime-picker
               v-model="currentTime"
               type="time"
               :filter="filter"
-              @confirm="timesConfirm"
-              @cancel="timesCancel"
+              @confirm="onsTimeConfirm"
+              @cancel="onsTimeCancel"
             />
             <template #reference>
               <van-field
+                autocomplete="off"
                 :clearable="true"
                 label="开始时间"
-                placeholder="开始时间"
+                placeholder="选择开始时间"
                 title="开始时间"
-                v-model="dstime"
-                :rules="[{ required: true, message: '请填写开始时间' }]"
+                v-model="stime"
+                :rules="[{ required: true, message: '选择开始时间' }]"
               ></van-field>
             </template> </van-popover
         ></van-col>
-        <van-col span="3"
-          ><van-popover v-model:show="showeTime" placement="bottom">
-            <van-datetime-picker
-              v-model="currentTime"
-              type="time"
-              :filter="filter"
-              @confirm="timeeConfirm"
-              @cancel="timeeCancel"
+        <van-col span="6">
+          <van-popover v-model:show="showeDatePopup" placement="bottom-start">
+            <van-calendar
+              ref="dateeref"
+              first-day-of-week="1"
+              :allow-same-day="true"
+              title="日历"
+              :poppable="false"
+              @confirm="oneDateConfirm"
+              :style="{ height: '400px', width: '400px' }"
             />
             <template #reference>
               <van-field
+                autocomplete="off"
                 :clearable="true"
-                label="结束时间"
-                placeholder="结束时间"
-                title="结束时间"
-                v-model="detime"
-                :rules="[{ required: true, message: '请填写结束时间' }]"
+                label="结束日期"
+                placeholder="年-月-日"
+                title="结束日期"
+                v-model="edate"
+                @clear="clearedate"
+                @update:model-value="edateupdate"
+                :rules="[{ required: true, message: '选择结束日期' }]"
               ></van-field>
-            </template> </van-popover
+            </template>
+          </van-popover>
+        </van-col>
+        <van-col span="6"
+          ><van-cell-group
+            ><van-popover v-model:show="showeTimePopup" placement="bottom">
+              <van-datetime-picker
+                v-model="currentTime"
+                type="time"
+                :filter="filter"
+                @confirm="oneTimeConfirm"
+                @cancel="oneTimeCancel"
+              />
+              <template #reference>
+                <van-field
+                  autocomplete="off"
+                  :clearable="true"
+                  label="结束时间"
+                  placeholder="选择结束时间"
+                  title="结束时间"
+                  v-model="etime"
+                  :rules="[{ required: true, message: '选择结束时间' }]"
+                ></van-field>
+              </template> </van-popover></van-cell-group
         ></van-col>
-        <van-col span="3">
-          <van-field name="checkbox" label="非连续" label-align="center">
+      </van-row>
+      <van-row>
+        <van-col span="8">
+          <van-field name="radio" label="封路日期">
             <template #input>
-              <van-checkbox v-model="checked" shape="square">选中</van-checkbox>
+              <van-radio-group v-model="dailyradio" direction="horizontal">
+                <van-radio name="T">连续</van-radio>
+                <van-radio name="F">非连续</van-radio>
+              </van-radio-group>
             </template>
           </van-field>
         </van-col>
-        <van-col span="9">
-          <van-popover v-model:show="showexPopover" placement="bottom-start">
+        <van-col span="16">
+          <van-popover v-model:show="showextDatePopup" placement="bottom-start">
             <van-calendar
-              ref="exdateref"
+              ref="dateextref"
               type="multiple"
               title="日历"
               first-day-of-week="1"
               :poppable="false"
               @confirm="onexConfirm"
-              :style="{ height: '400px', width: '500' }"
+              :style="{ height: '400px', width: '400px' }"
             />
             <template #reference>
               <van-field
+                autocomplete="off"
                 :clearable="true"
                 label="排除日期"
                 placeholder="排除日期"
                 title="排除日期"
-                v-model="exdate"
-                @clear="clearexdate"
+                v-model="extdate"
+                @clear="clearextdate"
               ></van-field>
             </template> </van-popover
         ></van-col>
       </van-row>
-
-      <div style="margin: 16px">
-        <van-button type="primary" native-type="submit" size="large">
-          生成SQL语句
-        </van-button>
-      </div>
-    </van-form>
-    <van-row>
-      <van-col span="2">
-        <div style="padding-left: 16px">
-          <van-button type="danger" class="btn" id="btn" @click="copysql"
-            >复制生成的SQL</van-button
+      <van-row>
+        <van-col span="24">
+          <div class="padding">
+            <van-button type="primary" native-type="submit" size="large">
+              生成SQL语句
+            </van-button>
+          </div>
+        </van-col>
+      </van-row>
+      <van-row>
+        <van-col span="12">
+          <van-field
+            autocomplete="off"
+            v-model="sqlname"
+            center
+            clearable
+            label="文件名"
+            placeholder="保存的文件名"
           >
-        </div></van-col
-      >
-      <van-col span="2"
-        ><van-button type="success" class="btn" id="btn" @click="saveAsText"
-          >保存生成的SQL</van-button
+            <template #button>
+              <div class="button-div">
+                <van-button type="danger" @click="saveAsText"
+                  >保存SQL</van-button
+                >
+                <van-button type="danger" class="btn" id="btn" @click="copysql"
+                  >复制SQL</van-button
+                >
+              </div>
+            </template>
+          </van-field></van-col
         >
-      </van-col>
-    </van-row>
+        <van-col span="12">
+          <div class="padding-tlrb-div">
+            <van-button type="success" @click="resetTitle"
+              >清除标题和内容</van-button
+            >
+            <van-button type="success" @click="resetTime"
+              >清除日期和时间</van-button
+            >
+            <van-button type="success" @click="resetSQL">清除SQL</van-button>
+          </div>
+        </van-col>
+      </van-row>
+    </van-form>
     <van-row justify="center">
       <van-col span="24">
         <div style="padding-left: 16px">
+          <van-divider>生成SQL</van-divider>
           <div id="bar" v-html="textsql"></div>
         </div>
       </van-col>
@@ -176,7 +238,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { Col, Row, Button, Checkbox, RadioGroup, Radio } from 'vant'
+import { Col, Row, Button, Checkbox, RadioGroup, Radio, Divider } from 'vant'
 import { Form, Field, CellGroup } from 'vant'
 import { Cell, Calendar, Popover } from 'vant'
 import { DatetimePicker, Toast } from 'vant'
@@ -215,30 +277,42 @@ export default defineComponent({
     [Cell.name]: Cell,
     [Popover.name]: Popover,
     [DatetimePicker.name]: DatetimePicker,
-    [Toast.name]: Toast
+    [Toast.name]: Toast,
+    [Divider.name]: Divider
   },
   setup() {
     //日历组件实例
-    const exdateref = ref<CalendarInstance>()
-    const dateref = ref<CalendarInstance>()
+    const datesref = ref<CalendarInstance>()
+    const dateeref = ref<CalendarInstance>()
+    const dateextref = ref<CalendarInstance>()
 
-    const textsql = ref('以后这里就是生成SQL啊。。。。。')
+    const textsql = ref('')
     const heading_zh = ref('')
     const heading_en = ref('')
     const content_zh = ref('')
     const content_en = ref('')
-    const date = ref('')
-    const exdate = ref('')
+
+    const extdate = ref('')
     const show = ref(false)
     const checked = ref(false)
-    const radiochecked = ref('HK')
-    const showPopover = ref(false)
-    const showexPopover = ref(false)
-    const dstime = ref('')
-    const detime = ref('')
-    const showsTime = ref(false)
-    const showeTime = ref(false)
+    const zoneradio = ref('HK')
+    const dailyradio = ref('F')
+    const showextDatePopup = ref(false)
+
     const currentTime = ref('12:30')
+
+    const showsDatePopup = ref(false)
+    const sdate = ref('')
+
+    const showeDatePopup = ref(false)
+    const edate = ref('')
+
+    const showsTimePopup = ref(false)
+    const stime = ref('')
+
+    const showeTimePopup = ref(false)
+    const etime = ref('')
+    const sqlname = ref('')
 
     //时间选择步长设置
     const filter = (type: string, options: []) => {
@@ -252,57 +326,70 @@ export default defineComponent({
       //return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
       return dayjs(date).format(S_DATE_TIME_FORMAT)
     }
-    const onConfirm = (dates: any) => {
-      const [start, end] = dates
-      dates.map(function (item: Date) {
-        console.log(formatDate(item)) // 1
-      })
-      // show.value = false
-      showPopover.value = false
-      date.value = `${formatDate(start)}至${formatDate(end)}`
+    const onsDateConfirm = (value: any) => {
+      showsDatePopup.value = false
+      sdate.value = formatDate(value)
+    }
+    const sdateupdate = (v: any) => {
+      datesref.value?.reset(dayjs(v).toDate())
+      console.log(v)
+    }
+    const edateupdate = (v: any) => {
+      dateeref.value?.reset(dayjs(v).toDate())
+      console.log(v)
+    }
+    const oneDateConfirm = (value: any) => {
+      showeDatePopup.value = false
+      edate.value = formatDate(value)
     }
     const onexConfirm = (dates: any) => {
-      showexPopover.value = false
+      showextDatePopup.value = false
       const tmpdate: Array<string> = []
       dates.map(function (item: Date) {
         tmpdate.push(formatDate(item)) // 1
       })
-      exdate.value = tmpdate.join(',')
+      extdate.value = tmpdate.join(',')
     }
 
-    const timesCancel = () => {
-      showsTime.value = false
+    const onsTimeCancel = () => {
+      showsTimePopup.value = false
     }
-    const timesConfirm = (value: any) => {
+    const onsTimeConfirm = (value: any) => {
       console.log(value)
-      showsTime.value = false
-      dstime.value = value
+      showsTimePopup.value = false
+      stime.value = value
     }
 
-    const timeeCancel = () => {
-      showeTime.value = false
+    const oneTimeCancel = () => {
+      showeTimePopup.value = false
     }
-    const timeeConfirm = (value: any) => {
+    const oneTimeConfirm = (value: any) => {
       console.log(value)
-      showeTime.value = false
-      detime.value = value
+      showeTimePopup.value = false
+      etime.value = value
     }
 
-    const clearexdate = () => {
-      showexPopover.value = false
-      exdateref.value?.reset()
+    const clearextdate = () => {
+      showextDatePopup.value = false
+      dateextref.value?.reset()
     }
 
-    const cleardate = () => {
-      showPopover.value = false
-      dateref.value?.reset()
+    const clearsdate = () => {
+      showsDatePopup.value = false
+      datesref.value?.reset()
     }
+    const clearedate = () => {
+      showeDatePopup.value = false
+      dateeref.value?.reset()
+    }
+
     const createsql = () => {
       textsql.value = ''
-      const exdateArr: Array<string> = exdate.value.split(',')
-      const datezone = date.value.split('至')
+      const exdateArr: Array<string> = extdate.value.split(',')
+      //date.value.split('至')
+      const datezone = [sdate.value, edate.value]
       //开始复制
-      if (checked.value) {
+      if (dailyradio.value == 'F') {
         //非连续日期区间
         const dtlen = dayjs(datezone[1]).diff(datezone[0], 'day')
 
@@ -319,7 +406,7 @@ export default defineComponent({
             createoncesqltpl(currdate, nextdate)
           } else {
             //非连续，在排除日期内
-            console.log('指定元素： ' + currdate + ' 在数组中')
+            console.log(currdate + ' 在排除的数组中.')
           }
         }
       } else {
@@ -388,9 +475,13 @@ export default defineComponent({
       //textsql.value = textsql.value.replace('<br/>', '\\n\\r')
     }
     const saveAsText = () => {
+      if (!sqlname.value) {
+        Toast.fail('文件名为空')
+        return
+      }
       const str = textsql.value.replace(/<br\/>/g, '\r\n')
       const strData = new Blob([str], { type: 'text/plain;charset=utf-8' })
-      saveAs(strData, '测试文件下载.sql')
+      saveAs(strData, sqlname.value + '.sql')
     }
 
     const createoncesqltpl = (sdate: string, edate: string) => {
@@ -399,28 +490,34 @@ export default defineComponent({
       )
       const extversion = ref()
 
-      const start_time = dayjs(sdate + ' ' + dstime.value)
+      const start_time = dayjs(sdate + ' ' + stime.value)
         .utcOffset(0)
         .format(DATE_TIME_FORMAT)
-      const end_time = dayjs(edate + ' ' + detime.value)
+      let end_time = dayjs(edate + ' ' + etime.value)
         .utcOffset(0)
         .format(DATE_TIME_FORMAT)
 
+      //如果 end_time 比 start_time小 说明跨日了，end_time需要加上一天
+      const dttime = dayjs(end_time).diff(dayjs(start_time), 'minutes')
+      if (dttime < 0) {
+        end_time = dayjs(end_time).add(1, 'day').format(DATE_TIME_FORMAT)
+      }
+
       sqltpl.value = sqltpl.value.replace(
         '#heading_zh#',
-        heading_zh.value.replace("'", "''")
+        sqlfilter(heading_zh.value)
       )
       sqltpl.value = sqltpl.value.replace(
         '#heading_en#',
-        heading_en.value.replace("'", "''")
+        sqlfilter(heading_en.value)
       )
       sqltpl.value = sqltpl.value.replace(
         '#content_zh#',
-        content_zh.value.replace("'", "''")
+        sqlfilter(content_zh.value) + ' ' + MAPVERSION[zoneradio.value].memo_zh
       )
       sqltpl.value = sqltpl.value.replace(
         '#content_en#',
-        content_en.value.replace("'", "''")
+        sqlfilter(content_en.value) + ' ' + MAPVERSION[zoneradio.value].memo_en
       )
 
       sqltpl.value = sqltpl.value.replace(
@@ -448,16 +545,21 @@ export default defineComponent({
       extversion.value = sqltpl.value
       extversion.value = extversion.value.replace(
         '#road_version#',
-        MAPVERSION[radiochecked.value].version1
+        MAPVERSION[zoneradio.value].version1
       )
       textsql.value += extversion.value
 
       extversion.value = sqltpl.value
       extversion.value = extversion.value.replace(
         '#road_version#',
-        MAPVERSION[radiochecked.value].version2
+        MAPVERSION[zoneradio.value].version2
       )
       textsql.value += extversion.value
+    }
+    const sqlfilter = (text: string) => {
+      text = text.replace(/'/g, "\\'")
+      text = text.replace(/"/g, '\\"')
+      return text
     }
     const copysql = () => {
       const clipboard = new Clipboard('.btn')
@@ -471,38 +573,74 @@ export default defineComponent({
       })
     }
 
+    const resetTitle = () => {
+      heading_zh.value = ''
+      heading_en.value = ''
+      content_zh.value = ''
+      content_en.value = ''
+    }
+    const resetTime = () => {
+      sdate.value = ''
+      edate.value = ''
+      stime.value = ''
+      etime.value = ''
+      extdate.value = ''
+
+      datesref.value?.reset()
+      dateeref.value?.reset()
+      dateextref.value?.reset()
+    }
+
+    const resetSQL = () => {
+      textsql.value = ''
+      const obj = document.getElementById('btn')
+      obj?.removeAttribute('data-clipboard-text')
+    }
+
     return {
-      date,
-      exdate,
+      sdate,
+      edate,
+      extdate,
       show,
-      showPopover,
-      showexPopover,
-      showsTime,
-      showeTime,
+      showsDatePopup,
+      showeDatePopup,
+      showsTimePopup,
+      showeTimePopup,
+      showextDatePopup,
       currentTime,
-      dstime,
-      detime,
+      stime,
+      etime,
       checked,
-      radiochecked,
+      zoneradio,
+      dailyradio,
       heading_zh,
       heading_en,
       content_zh,
       content_en,
-      exdateref,
-      dateref,
+      datesref,
+      dateeref,
+      dateextref,
       textsql,
-      onConfirm,
+      sqlname,
+      onsDateConfirm,
+      oneDateConfirm,
       onexConfirm,
       filter,
-      timesCancel,
-      timesConfirm,
-      timeeCancel,
-      timeeConfirm,
-      clearexdate,
-      cleardate,
+      onsTimeCancel,
+      onsTimeConfirm,
+      oneTimeCancel,
+      oneTimeConfirm,
+      clearextdate,
+      clearsdate,
+      clearedate,
       createsql,
       copysql,
-      saveAsText
+      saveAsText,
+      sdateupdate,
+      edateupdate,
+      resetTitle,
+      resetTime,
+      resetSQL
     }
   }
 })
@@ -521,5 +659,17 @@ export default defineComponent({
 }
 .ymaxwidth {
   width: 100%;
+}
+.padding-lr-div {
+  padding: 0px 16px;
+}
+.padding-tlrb-div {
+  padding: 10px 16px;
+}
+.padding-tlrb-div button {
+  margin-right: 10px;
+}
+.button-div button {
+  margin-right: 10px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="page" id="pageui">
-    <van-form>
+    <van-form @submit="createsql">
       <van-row justify="center">
         <van-col span="24">
           <van-cell-group>
@@ -17,6 +17,7 @@
               placeholder="中文标题"
               v-model="heading_zh"
               :clearable="true"
+              :rules="[{ required: true, message: '请填写中文标题' }]"
             ></van-field>
             <van-field
               label="英文标题"
@@ -29,6 +30,7 @@
               placeholder="中文内容"
               :clearable="true"
               v-model="content_zh"
+              :rules="[{ required: true, message: '请填写中文内容' }]"
             ></van-field>
             <van-field
               label="英文内容"
@@ -60,6 +62,7 @@
                 title="选择日期"
                 v-model="date"
                 @clear="cleardate"
+                :rules="[{ required: true, message: '选择日期' }]"
               ></van-field>
             </template>
           </van-popover>
@@ -80,6 +83,7 @@
                 placeholder="开始时间"
                 title="开始时间"
                 v-model="dstime"
+                :rules="[{ required: true, message: '请填写开始时间' }]"
               ></van-field>
             </template> </van-popover
         ></van-col>
@@ -99,6 +103,7 @@
                 placeholder="结束时间"
                 title="结束时间"
                 v-model="detime"
+                :rules="[{ required: true, message: '请填写结束时间' }]"
               ></van-field>
             </template> </van-popover
         ></van-col>
@@ -132,23 +137,30 @@
             </template> </van-popover
         ></van-col>
       </van-row>
+
+      <div style="margin: 16px">
+        <van-button type="primary" native-type="submit" size="large">
+          生成SQL语句
+        </van-button>
+      </div>
     </van-form>
-    <div style="margin: 16px">
-      <van-button
-        type="primary"
-        native-type="submit"
-        size="large"
-        @click="createsql"
-      >
-        生成SQL语句
-      </van-button>
-    </div>
-    <van-row justify="center">
-      <van-col span="24">
+    <van-row>
+      <van-col span="2">
         <div style="padding-left: 16px">
           <van-button type="danger" class="btn" id="btn" @click="copysql"
             >复制生成的SQL</van-button
           >
+        </div></van-col
+      >
+      <van-col span="2"
+        ><van-button type="success" class="btn" id="btn" @click="saveAsText"
+          >保存生成的SQL</van-button
+        >
+      </van-col>
+    </van-row>
+    <van-row justify="center">
+      <van-col span="24">
+        <div style="padding-left: 16px">
           <div id="bar" v-html="textsql"></div>
         </div>
       </van-col>
@@ -178,6 +190,8 @@ import { MAPVERSION, DEFAULTVALUE } from './config/config'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import isBetween from 'dayjs/plugin/isBetween'
+
+import { saveAs } from 'file-saver'
 
 dayjs.extend(utc)
 
@@ -225,9 +239,6 @@ export default defineComponent({
     const showsTime = ref(false)
     const showeTime = ref(false)
     const currentTime = ref('12:30')
-
-    const textsqltmp =
-      'insert into tec_geo_prepare(heading_zh,heading_en,content_zh,content_en,type_code,cause_code,source_id,shown_now,announcement_time,road_version,created_at,updated_at,start_time,end_time)'
 
     //时间选择步长设置
     const filter = (type: string, options: []) => {
@@ -287,52 +298,14 @@ export default defineComponent({
       dateref.value?.reset()
     }
     const createsql = () => {
-      //insert into tec_geo_prepare(heading_zh,heading_en,content_zh,content_en,type_code,cause_code,source_id,shown_now,announcement_time,road_version,created_at,updated_at,start_time,end_time)
-      //values ('啊','吧','1臨時封閉','2 temporarily closed',1,103,4,false,timestamp '2022-05-19 01:00:00','20200721',timestamp '2022-05-19 01:00:00',timestamp '2022-05-19 01:00:00',timestamp '2020-08-12 12:00',timestamp '2020-08-15 02:00');
-
-      const sqltpl = ref(
-        `insert into tec_geo_prepare(heading_zh,heading_en,content_zh,content_en,type_code,cause_code,source_id,shown_now,announcement_time,road_version,created_at,updated_at,start_time,end_time) values("#heading_zh#","#heading_en#","#content_zh#","#content_en#",#type_code#,#cause_code#,#source_id#,#shown_now#,#announcement_time#,"#road_version#",#created_at#,#updated_at#,#start_time#,#end_time#);<br/>`
-      )
-      const extversion = ref()
-
-      sqltpl.value = sqltpl.value.replace('#heading_zh#', heading_zh.value)
-      sqltpl.value = sqltpl.value.replace(
-        '#heading_en#',
-        heading_en.value.replace("'", "''")
-      )
-      sqltpl.value = sqltpl.value.replace('#content_zh#', content_zh.value)
-      sqltpl.value = sqltpl.value.replace(
-        '#content_en#',
-        content_en.value.replace("'", "''")
-      )
-
-      sqltpl.value = sqltpl.value.replace(
-        '#type_code#',
-        DEFAULTVALUE['type_code']
-      )
-      sqltpl.value = sqltpl.value.replace(
-        '#cause_code#',
-        DEFAULTVALUE['cause_code']
-      )
-      sqltpl.value = sqltpl.value.replace(
-        '#source_id#',
-        DEFAULTVALUE['source_id']
-      )
-      sqltpl.value = sqltpl.value.replace(
-        '#shown_now#',
-        DEFAULTVALUE['shown_now']
-      )
-      sqltpl.value = sqltpl.value.replace('#announcement_time#', today)
-      sqltpl.value = sqltpl.value.replace('#created_at#', today)
-      sqltpl.value = sqltpl.value.replace('#updated_at#', today)
-
       textsql.value = ''
+      const exdateArr: Array<string> = exdate.value.split(',')
+      const datezone = date.value.split('至')
       //开始复制
       if (checked.value) {
-        //非连续, 找出时间段的所有日期
-        const datezone = date.value.split('至')
+        //非连续日期区间
         const dtlen = dayjs(datezone[1]).diff(datezone[0], 'day')
-        const exdateArr: Array<string> = exdate.value.split(',')
+
         for (let i = 0; i <= dtlen; i++) {
           const currdate = dayjs(datezone[0])
             .add(i, 'day')
@@ -343,46 +316,14 @@ export default defineComponent({
               .add(i, 'day')
               .format(S_DATE_TIME_FORMAT)
 
-            const start_time = dayjs(currdate + ' ' + dstime.value)
-              .utcOffset(0)
-              .format(DATE_TIME_FORMAT)
-            const end_time = dayjs(nextdate + ' ' + detime.value)
-              .utcOffset(0)
-              .format(DATE_TIME_FORMAT)
-
-            //复制模版这里有点不同，需要每次都不同时间
-            extversion.value = sqltpl.value
-            extversion.value = extversion.value.replace(
-              '#start_time#',
-              start_time
-            )
-            extversion.value = extversion.value.replace('#end_time#', end_time)
-            extversion.value = extversion.value.replace(
-              '#road_version#',
-              MAPVERSION[radiochecked.value].version1
-            )
-            textsql.value += extversion.value
-
-            extversion.value = sqltpl.value
-            extversion.value = extversion.value.replace(
-              '#start_time#',
-              start_time
-            )
-            extversion.value = extversion.value.replace('#end_time#', end_time)
-            extversion.value = extversion.value.replace(
-              '#road_version#',
-              MAPVERSION[radiochecked.value].version2
-            )
-            textsql.value += extversion.value
+            createoncesqltpl(currdate, nextdate)
           } else {
             //非连续，在排除日期内
             console.log('指定元素： ' + currdate + ' 在数组中')
           }
         }
       } else {
-        const exdateArr: Array<string> = exdate.value.split(',')
-        const datezone = date.value.split('至')
-
+        //连续日期区间
         //找出要排除的有效日期数组
         dayjs.extend(isBetween)
         const newexdateArr = exdateArr
@@ -391,7 +332,7 @@ export default defineComponent({
             dayjs(item).isBetween(datezone[0], datezone[1], 'day')
           )
         if (newexdateArr.length) {
-          //连续,有排除日期
+          //有排除日期
           for (let i = 0; i < newexdateArr.length; i++) {
             const predate = dayjs(newexdateArr[i])
               .subtract(1, 'day')
@@ -432,7 +373,7 @@ export default defineComponent({
             }
           }
         } else {
-          //连续,没有排除日期
+          //没排除日期
           createoncesqltpl(datezone[0], datezone[1])
         }
       }
@@ -442,11 +383,19 @@ export default defineComponent({
         'data-clipboard-text',
         textsql.value.replace(/<br\/>/g, '\n')
       )
+
+      Toast.success('生成SQL成功.')
       //textsql.value = textsql.value.replace('<br/>', '\\n\\r')
     }
+    const saveAsText = () => {
+      const str = textsql.value.replace(/<br\/>/g, '\r\n')
+      const strData = new Blob([str], { type: 'text/plain;charset=utf-8' })
+      saveAs(strData, '测试文件下载.sql')
+    }
+
     const createoncesqltpl = (sdate: string, edate: string) => {
       const sqltpl = ref(
-        `insert into tec_geo_prepare(heading_zh,heading_en,content_zh,content_en,type_code,cause_code,source_id,shown_now,announcement_time,road_version,created_at,updated_at,start_time,end_time) values("#heading_zh#","#heading_en#","#content_zh#","#content_en#",#type_code#,#cause_code#,#source_id#,#shown_now#,#announcement_time#,"#road_version#",#created_at#,#updated_at#,#start_time#,#end_time#);<br/>`
+        `insert into tec_geo_prepare(heading_zh,heading_en,content_zh,content_en,type_code,cause_code,source_id,shown_now,announcement_time,road_version,created_at,updated_at,start_time,end_time) values("#heading_zh#","#heading_en#","#content_zh#","#content_en#",#type_code#,#cause_code#,#source_id#,#shown_now#,timestamp "#announcement_time#","#road_version#",timestamp "#created_at#",timestamp "#updated_at#,#start_time#",timestamp "#end_time#");<br/>`
       )
       const extversion = ref()
 
@@ -457,12 +406,18 @@ export default defineComponent({
         .utcOffset(0)
         .format(DATE_TIME_FORMAT)
 
-      sqltpl.value = sqltpl.value.replace('#heading_zh#', heading_zh.value)
+      sqltpl.value = sqltpl.value.replace(
+        '#heading_zh#',
+        heading_zh.value.replace("'", "''")
+      )
       sqltpl.value = sqltpl.value.replace(
         '#heading_en#',
         heading_en.value.replace("'", "''")
       )
-      sqltpl.value = sqltpl.value.replace('#content_zh#', content_zh.value)
+      sqltpl.value = sqltpl.value.replace(
+        '#content_zh#',
+        content_zh.value.replace("'", "''")
+      )
       sqltpl.value = sqltpl.value.replace(
         '#content_en#',
         content_en.value.replace("'", "''")
@@ -507,7 +462,6 @@ export default defineComponent({
     const copysql = () => {
       const clipboard = new Clipboard('.btn')
       clipboard.on('success', () => {
-        console.log(MAPVERSION[radiochecked.value].version1)
         Toast.success('复制成功.')
         clipboard.destroy()
       })
@@ -537,7 +491,6 @@ export default defineComponent({
       exdateref,
       dateref,
       textsql,
-      textsqltmp,
       onConfirm,
       onexConfirm,
       filter,
@@ -548,7 +501,8 @@ export default defineComponent({
       clearexdate,
       cleardate,
       createsql,
-      copysql
+      copysql,
+      saveAsText
     }
   }
 })

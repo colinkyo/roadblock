@@ -4,14 +4,27 @@ interface mapversiontype {
 interface mapitem {
   version1: string
   version2: string
+  memo_zh?: string
+  memo_en?: string
 }
+
 // 👇️ this will only ever be one of object's keys
 interface dtype {
   [key: string]: any
 }
 const MAPVERSION: mapversiontype = {
-  HK: { version1: '20200721', version2: '20210617' },
-  MO: { version1: '20200918', version2: '20210714' }
+  HK: {
+    version1: '20200721',
+    version2: '20210617',
+    memo_zh: '臨時封閉',
+    memo_en: 'temporarily closed'
+  },
+  MO: {
+    version1: '20200918',
+    version2: '20210714',
+    memo_zh: '封閉交通',
+    memo_en: ''
+  }
 }
 const DEFAULTKEYS: Array<string> = [
   'heading_zh',
