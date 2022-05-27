@@ -219,7 +219,9 @@
             <van-button type="success" @click="resetTime"
               >清除日期和时间</van-button
             >
-            <van-button type="success" @click="resetSQL">清除SQL</van-button>
+            <van-button type="success" @click="resetSQL"
+              >清除SQL和文件名</van-button
+            >
           </div>
         </van-col>
       </van-row>
@@ -242,7 +244,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, watch } from 'vue'
 import { Col, Row, Button, Checkbox, RadioGroup, Radio, Divider } from 'vant'
 import { Form, Field, CellGroup } from 'vant'
 import { Cell, Calendar, Popover } from 'vant'
@@ -596,8 +598,16 @@ export default defineComponent({
       dateextref.value?.reset()
     }
 
+    watch(heading_zh, (newX) => {
+      sqlname.value = sdate.value + ' ' + newX
+    })
+    watch(sdate, (newX) => {
+      sqlname.value = newX + ' ' + heading_zh.value
+    })
+
     const resetSQL = () => {
       textsql.value = ''
+      sqlname.value = ''
       const obj = document.getElementById('btn')
       obj?.removeAttribute('data-clipboard-text')
     }
