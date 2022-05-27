@@ -13,6 +13,7 @@
               </template>
             </van-field>
             <van-field
+              autocomplete="off"
               label="中文标题"
               placeholder="中文标题"
               v-model="heading_zh"
@@ -20,6 +21,7 @@
               :rules="[{ required: true, message: '请填写中文标题' }]"
             ></van-field>
             <van-field
+              autocomplete="off"
               label="英文标题"
               placeholder="英文标题"
               :clearable="true"
