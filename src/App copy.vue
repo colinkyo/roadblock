@@ -56,7 +56,7 @@
               :show-title="false"
               :poppable="false"
               @confirm="onsDateConfirm"
-              :style="{ height: '350px', width: '350px' }"
+              :style="{ height: '400px', width: '400px' }"
             />
             <template #reference>
               <van-field
@@ -105,7 +105,7 @@
               :show-title="false"
               :poppable="false"
               @confirm="oneDateConfirm"
-              :style="{ height: '350px', width: '350px' }"
+              :style="{ height: '400px', width: '400px' }"
             />
             <template #reference>
               <van-field
@@ -151,11 +151,7 @@
         <van-col span="8">
           <van-field name="radio" label="封路日期">
             <template #input>
-              <van-radio-group
-                v-model="dailyradio"
-                direction="horizontal"
-                @change="cdailyradio"
-              >
+              <van-radio-group v-model="dailyradio" direction="horizontal">
                 <van-radio name="T">连续</van-radio>
                 <van-radio name="F">非连续</van-radio>
               </van-radio-group>
@@ -163,38 +159,24 @@
           </van-field>
         </van-col>
         <van-col span="16">
-          <van-field name="radio" label="封路日期">
-            <template #input>
-              <van-radio-group
-                v-model="inexradio"
-                direction="horizontal"
-                :disabled="isdisabled"
-              >
-                <van-radio name="T">选中</van-radio>
-                <van-radio name="F">排除</van-radio>
-              </van-radio-group>
-            </template>
-          </van-field>
           <van-popover v-model:show="showextDatePopup" placement="bottom-start">
             <van-calendar
               ref="dateextref"
               type="multiple"
               title="日历"
-              :default-date="null"
               :show-title="false"
               first-day-of-week="1"
               :poppable="false"
               @confirm="onexConfirm"
-              :style="{ height: '350px', width: '350px' }"
+              :style="{ height: '400px', width: '400px' }"
             />
             <template #reference>
               <van-field
-                :disabled="isdisabled"
                 autocomplete="off"
                 :clearable="true"
-                placeholder="日期"
-                title="日期"
-                @click="sssaa"
+                label="排除日期"
+                placeholder="排除日期"
+                title="排除日期"
                 v-model="extdate"
                 @clear="clearextdate"
               ></van-field>
@@ -327,9 +309,7 @@ export default defineComponent({
     const checked = ref(false)
     const zoneradio = ref('HK')
     const dailyradio = ref('F')
-    const inexradio = ref('F')
     const showextDatePopup = ref(false)
-    const isdisabled = ref(false)
 
     const currentTime = ref('12:30')
 
@@ -380,7 +360,7 @@ export default defineComponent({
       dates.map(function (item: Date) {
         tmpdate.push(formatDate(item)) // 1
       })
-      extdate.value = tmpdate.sort().join(',')
+      extdate.value = tmpdate.join(',')
     }
 
     const onsTimeCancel = () => {
@@ -430,16 +410,7 @@ export default defineComponent({
             .add(i, 'day')
             .format(S_DATE_TIME_FORMAT)
           //非连续不在排除日期内
-          if (exdateArr.indexOf(currdate) === -1 && inexradio.value == 'F') {
-            const nextdate = dayjs(datezone[0])
-              .add(i, 'day')
-              .format(S_DATE_TIME_FORMAT)
-
-            createoncesqltpl(currdate, nextdate)
-          } else if (
-            exdateArr.indexOf(currdate) !== -1 &&
-            inexradio.value == 'T'
-          ) {
+          if (exdateArr.indexOf(currdate) === -1) {
             const nextdate = dayjs(datezone[0])
               .add(i, 'day')
               .format(S_DATE_TIME_FORMAT)
@@ -459,9 +430,7 @@ export default defineComponent({
           .filter((item) =>
             dayjs(item).isBetween(datezone[0], datezone[1], 'day')
           )
-        //连续日期不再考虑有没有排除选中日期，有需要再升级
-        const isfalse = false
-        if (newexdateArr.length && isfalse) {
+        if (newexdateArr.length) {
           //有排除日期
           for (let i = 0; i < newexdateArr.length; i++) {
             const predate = dayjs(newexdateArr[i])
@@ -653,21 +622,6 @@ export default defineComponent({
       resetSQL()
     }
 
-    const cdailyradio = (text: string) => {
-      if (text == 'T') {
-        isdisabled.value = true
-        showextDatePopup.value = false
-      } else {
-        isdisabled.value = false
-      }
-    }
-    const sssaa = () => {
-      if (dailyradio.value == 'T') {
-        showextDatePopup.value = true
-      } else {
-        showextDatePopup.value = false
-      }
-    }
     return {
       sdate,
       edate,
@@ -684,8 +638,6 @@ export default defineComponent({
       checked,
       zoneradio,
       dailyradio,
-      inexradio,
-      isdisabled,
       heading_zh,
       heading_en,
       content_zh,
@@ -714,9 +666,7 @@ export default defineComponent({
       resetTitle,
       resetTime,
       resetSQL,
-      resetALL,
-      cdailyradio,
-      sssaa
+      resetALL
     }
   }
 })
