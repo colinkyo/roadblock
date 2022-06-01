@@ -56,7 +56,7 @@
               :show-title="false"
               :poppable="false"
               @confirm="onsDateConfirm"
-              :style="{ height: '400px', width: '400px' }"
+              :style="{ height: '350px', width: '350px' }"
             />
             <template #reference>
               <van-field
@@ -73,8 +73,8 @@
             </template>
           </van-popover>
         </van-col>
-        <van-col span="6"
-          ><van-popover v-model:show="showsTimePopup" placement="bottom">
+        <van-col span="6">
+          <van-popover v-model:show="showsTimePopup" placement="bottom">
             <van-datetime-picker
               v-model="currentTime"
               type="time"
@@ -92,8 +92,9 @@
                 v-model="stime"
                 :rules="[{ required: true, message: '选择开始时间' }]"
               ></van-field>
-            </template> </van-popover
-        ></van-col>
+            </template>
+          </van-popover>
+        </van-col>
         <van-col span="6">
           <van-popover v-model:show="showeDatePopup" placement="bottom-start">
             <van-calendar
@@ -104,7 +105,7 @@
               :show-title="false"
               :poppable="false"
               @confirm="oneDateConfirm"
-              :style="{ height: '400px', width: '400px' }"
+              :style="{ height: '350px', width: '350px' }"
             />
             <template #reference>
               <van-field
@@ -121,9 +122,9 @@
             </template>
           </van-popover>
         </van-col>
-        <van-col span="6"
-          ><van-cell-group
-            ><van-popover v-model:show="showeTimePopup" placement="bottom">
+        <van-col span="6">
+          <van-cell-group>
+            <van-popover placement="bottom" v-model:show="showeTimePopup">
               <van-datetime-picker
                 v-model="currentTime"
                 type="time"
@@ -141,14 +142,20 @@
                   v-model="etime"
                   :rules="[{ required: true, message: '选择结束时间' }]"
                 ></van-field>
-              </template> </van-popover></van-cell-group
-        ></van-col>
+              </template>
+            </van-popover>
+          </van-cell-group>
+        </van-col>
       </van-row>
       <van-row>
         <van-col span="8">
           <van-field name="radio" label="封路日期">
             <template #input>
-              <van-radio-group v-model="dailyradio" direction="horizontal">
+              <van-radio-group
+                v-model="dailyradio"
+                direction="horizontal"
+                @change="cdailyradio"
+              >
                 <van-radio name="T">连续</van-radio>
                 <van-radio name="F">非连续</van-radio>
               </van-radio-group>
@@ -156,41 +163,55 @@
           </van-field>
         </van-col>
         <van-col span="16">
+          <van-field name="radio" label="封路日期">
+            <template #input>
+              <van-radio-group
+                v-model="inexradio"
+                direction="horizontal"
+                :disabled="isdisabled"
+              >
+                <van-radio name="T">选中</van-radio>
+                <van-radio name="F">排除</van-radio>
+              </van-radio-group>
+            </template>
+          </van-field>
           <van-popover v-model:show="showextDatePopup" placement="bottom-start">
             <van-calendar
               ref="dateextref"
               type="multiple"
               title="日历"
+              :default-date="null"
               :show-title="false"
               first-day-of-week="1"
               :poppable="false"
               @confirm="onexConfirm"
-              :style="{ height: '400px', width: '400px' }"
+              :style="{ height: '350px', width: '350px' }"
             />
             <template #reference>
               <van-field
+                :disabled="isdisabled"
                 autocomplete="off"
                 :clearable="true"
-                label="排除日期"
-                placeholder="排除日期"
-                title="排除日期"
+                placeholder="日期"
+                title="日期"
                 v-model="extdate"
                 @clear="clearextdate"
               ></van-field>
-            </template> </van-popover
-        ></van-col>
+            </template>
+          </van-popover>
+        </van-col>
       </van-row>
       <van-row>
         <van-col span="24">
           <div class="padding">
-            <van-button type="primary" native-type="submit" size="large">
-              生成SQL语句
-            </van-button>
+            <van-button type="primary" native-type="submit" size="large"
+              >生成SQL语句</van-button
+            >
           </div>
         </van-col>
       </van-row>
       <van-row>
-        <van-col span="12">
+        <van-col span="10">
           <van-field
             autocomplete="off"
             v-model="sqlname"
@@ -209,9 +230,9 @@
                 >
               </div>
             </template>
-          </van-field></van-col
-        >
-        <van-col span="12">
+          </van-field>
+        </van-col>
+        <van-col span="14">
           <div class="padding-tlrb-div">
             <van-button type="success" @click="resetTitle"
               >清除标题和内容</van-button
@@ -222,6 +243,7 @@
             <van-button type="success" @click="resetSQL"
               >清除SQL和文件名</van-button
             >
+            <van-button type="success" @click="resetALL">全部清除</van-button>
           </div>
         </van-col>
       </van-row>
@@ -239,7 +261,7 @@
       data-clipboard-action="cut"
       data-clipboard-target="#bar"
       @click="copysql"
-    > -->
+    >-->
   </div>
 </template>
 
@@ -304,7 +326,9 @@ export default defineComponent({
     const checked = ref(false)
     const zoneradio = ref('HK')
     const dailyradio = ref('F')
+    const inexradio = ref('F')
     const showextDatePopup = ref(false)
+    const isdisabled = ref(false)
 
     const currentTime = ref('12:30')
 
@@ -355,7 +379,7 @@ export default defineComponent({
       dates.map(function (item: Date) {
         tmpdate.push(formatDate(item)) // 1
       })
-      extdate.value = tmpdate.join(',')
+      extdate.value = tmpdate.sort().join(',')
     }
 
     const onsTimeCancel = () => {
@@ -405,7 +429,16 @@ export default defineComponent({
             .add(i, 'day')
             .format(S_DATE_TIME_FORMAT)
           //非连续不在排除日期内
-          if (exdateArr.indexOf(currdate) === -1) {
+          if (exdateArr.indexOf(currdate) === -1 && inexradio.value == 'F') {
+            const nextdate = dayjs(datezone[0])
+              .add(i, 'day')
+              .format(S_DATE_TIME_FORMAT)
+
+            createoncesqltpl(currdate, nextdate)
+          } else if (
+            exdateArr.indexOf(currdate) !== -1 &&
+            inexradio.value == 'T'
+          ) {
             const nextdate = dayjs(datezone[0])
               .add(i, 'day')
               .format(S_DATE_TIME_FORMAT)
@@ -425,7 +458,9 @@ export default defineComponent({
           .filter((item) =>
             dayjs(item).isBetween(datezone[0], datezone[1], 'day')
           )
-        if (newexdateArr.length) {
+        //连续日期不再考虑有没有排除选中日期，有需要再升级
+        const isfalse = false
+        if (newexdateArr.length && isfalse) {
           //有排除日期
           for (let i = 0; i < newexdateArr.length; i++) {
             const predate = dayjs(newexdateArr[i])
@@ -611,7 +646,20 @@ export default defineComponent({
       const obj = document.getElementById('btn')
       obj?.removeAttribute('data-clipboard-text')
     }
+    const resetALL = () => {
+      resetTitle()
+      resetTime()
+      resetSQL()
+    }
 
+    const cdailyradio = (text: string) => {
+      if (text == 'T') {
+        isdisabled.value = true
+        showextDatePopup.value = false
+      } else {
+        isdisabled.value = false
+      }
+    }
     return {
       sdate,
       edate,
@@ -628,6 +676,8 @@ export default defineComponent({
       checked,
       zoneradio,
       dailyradio,
+      inexradio,
+      isdisabled,
       heading_zh,
       heading_en,
       content_zh,
@@ -655,7 +705,9 @@ export default defineComponent({
       edateupdate,
       resetTitle,
       resetTime,
-      resetSQL
+      resetSQL,
+      resetALL,
+      cdailyradio
     }
   }
 })
