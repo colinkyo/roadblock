@@ -194,7 +194,7 @@
                 :clearable="true"
                 placeholder="日期"
                 title="日期"
-                @click="sssaa"
+                @click="hideextdate"
                 v-model="extdate"
                 @clear="clearextdate"
               ></van-field>
@@ -459,9 +459,9 @@ export default defineComponent({
           .filter((item) =>
             dayjs(item).isBetween(datezone[0], datezone[1], 'day')
           )
-        //连续日期不再考虑有没有排除选中日期，有需要再升级
-        const isfalse = false
-        if (newexdateArr.length && isfalse) {
+        //连续有排除日期
+        const isFalse = false
+        if (newexdateArr.length && inexradio.value == 'F') {
           //有排除日期
           for (let i = 0; i < newexdateArr.length; i++) {
             const predate = dayjs(newexdateArr[i])
@@ -502,6 +502,9 @@ export default defineComponent({
               }
             }
           }
+        } else if (newexdateArr.length && inexradio.value == 'T' && isFalse) {
+          //连续有选中日期
+          //createoncesqltpl(datezone[0], datezone[1])
         } else {
           //没排除日期
           createoncesqltpl(datezone[0], datezone[1])
@@ -661,7 +664,7 @@ export default defineComponent({
         isdisabled.value = false
       }
     }
-    const sssaa = () => {
+    const hideextdate = () => {
       if (dailyradio.value == 'T') {
         showextDatePopup.value = true
       } else {
@@ -716,7 +719,7 @@ export default defineComponent({
       resetSQL,
       resetALL,
       cdailyradio,
-      sssaa
+      hideextdate
     }
   }
 })
