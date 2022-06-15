@@ -532,7 +532,7 @@ export default defineComponent({
 
     const createoncesqltpl = (sdate: string, edate: string) => {
       const sqltpl = ref(
-        `insert into tec_geo_prepare(heading_zh,heading_en,content_zh,content_en,type_code,cause_code,source_id,shown_now,announcement_time,road_version,created_at,updated_at,start_time,end_time) values("#heading_zh#","#heading_en#","#content_zh#","#content_en#",#type_code#,#cause_code#,#source_id#,#shown_now#,timestamp "#announcement_time#","#road_version#",timestamp "#created_at#",timestamp "#updated_at#,#start_time#",timestamp "#end_time#");<br/>`
+        `insert into tec_geo_prepare(heading_zh,heading_en,content_zh,content_en,type_code,cause_code,source_id,shown_now,announcement_time,road_version,created_at,updated_at,start_time,end_time) values('#heading_zh#','#heading_en#','#content_zh#','#content_en#',#type_code#,#cause_code#,#source_id#,#shown_now#,timestamp '#announcement_time#','#road_version#',timestamp '#created_at#',timestamp '#updated_at#',timestamp '#start_time#',timestamp '#end_time#');<br/>`
       )
       const extversion = ref()
 
@@ -559,7 +559,7 @@ export default defineComponent({
       )
       sqltpl.value = sqltpl.value.replace(
         '#content_zh#',
-        sqlfilter(content_zh.value) + ' ' + MAPVERSION[zoneradio.value].memo_zh
+        sqlfilter(content_zh.value) + MAPVERSION[zoneradio.value].memo_zh
       )
       sqltpl.value = sqltpl.value.replace(
         '#content_en#',
@@ -603,7 +603,7 @@ export default defineComponent({
       textsql.value += extversion.value
     }
     const sqlfilter = (text: string) => {
-      text = text.replace(/'/g, "\\'")
+      text = text.replace(/'/g, "''")
       text = text.replace(/"/g, '\\"')
       return text
     }
