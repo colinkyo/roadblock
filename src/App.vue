@@ -49,6 +49,7 @@
         <van-col span="6">
           <van-popover v-model:show="showsDatePopup" placement="bottom-start">
             <van-calendar
+              :show-confirm="false"
               ref="datesref"
               first-day-of-week="1"
               :allow-same-day="true"
@@ -98,6 +99,7 @@
         <van-col span="6">
           <van-popover v-model:show="showeDatePopup" placement="bottom-start">
             <van-calendar
+              :show-confirm="false"
               ref="dateeref"
               first-day-of-week="1"
               :allow-same-day="true"
