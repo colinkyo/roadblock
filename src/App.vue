@@ -236,7 +236,7 @@
         <van-col span="14">
           <div class="padding-tlrb-div">
             <van-button type="success" @click="resetTitle"
-              >清除标题和内容</van-button
+              >清除中英文内容</van-button
             >
             <van-button type="success" @click="resetTime"
               >清除日期和时间</van-button
@@ -620,8 +620,8 @@ export default defineComponent({
     }
 
     const resetTitle = () => {
-      heading_zh.value = ''
-      heading_en.value = ''
+      //heading_zh.value = ''
+      //heading_en.value = ''
       content_zh.value = ''
       content_en.value = ''
     }
