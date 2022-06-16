@@ -651,6 +651,8 @@ export default defineComponent({
       obj?.removeAttribute('data-clipboard-text')
     }
     const resetALL = () => {
+      heading_zh.value = ''
+      heading_en.value = ''
       resetTitle()
       resetTime()
       resetSQL()
