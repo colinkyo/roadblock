@@ -527,6 +527,17 @@ export default defineComponent({
         Toast.fail('文件名为空')
         return
       }
+      const fs = require('fs')
+
+      //调用readFile方法读取磁盘文件：异步操作
+      fs.readFile('App.vue', function (err: any, data: any) {
+        //当文件读取失败时，可以获取到err的值，输出错误信息
+        if (err) throw err
+        //当文件读取成功时，可以获取到data的值，输出响应的内容
+        console.log(data.toString())
+      })
+      console.log('done')
+
       const str = textsql.value.replace(/<br\/>/g, '\r\n')
       const strData = new Blob([str], { type: 'text/plain;charset=utf-8' })
       saveAs(strData, sqlname.value + '.sql')
@@ -640,10 +651,11 @@ export default defineComponent({
     }
 
     watch(heading_zh, (newX) => {
-      sqlname.value = sdate.value + ' ' + newX
+      if (zoneradio.value == 'HK') sqlname.value = sdate.value + ' ' + newX
+      else sqlname.value = newX
     })
     watch(sdate, (newX) => {
-      sqlname.value = newX + ' ' + heading_zh.value
+      if (zoneradio.value == 'HK') sqlname.value = newX + ' ' + heading_zh.value
     })
 
     const resetSQL = () => {
