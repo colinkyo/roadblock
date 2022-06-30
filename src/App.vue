@@ -564,10 +564,17 @@ export default defineComponent({
         '#content_zh#',
         sqlfilter(content_zh.value) + MAPVERSION[zoneradio.value].memo_zh
       )
-      sqltpl.value = sqltpl.value.replace(
-        '#content_en#',
-        sqlfilter(content_en.value) + ' ' + MAPVERSION[zoneradio.value].memo_en
-      )
+
+      let content_en_text = ''
+      if (MAPVERSION[zoneradio.value].memo_en != '') {
+        content_en_text =
+          sqlfilter(content_en.value) +
+          ' ' +
+          MAPVERSION[zoneradio.value].memo_en
+      } else {
+        content_en_text = sqlfilter(content_en.value)
+      }
+      sqltpl.value = sqltpl.value.replace('#content_en#', content_en_text)
 
       sqltpl.value = sqltpl.value.replace(
         '#type_code#',
