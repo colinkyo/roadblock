@@ -49,6 +49,9 @@
         <van-col span="6">
           <van-popover v-model:show="showsDatePopup" placement="bottom-start">
             <van-calendar
+              :lazy-render="false"
+              row-height="25"
+              :max-date="maxDate"
               :show-confirm="false"
               ref="datesref"
               first-day-of-week="1"
@@ -57,7 +60,7 @@
               :show-title="false"
               :poppable="false"
               @confirm="onsDateConfirm"
-              :style="{ height: '350px', width: '350px' }"
+              :style="{ height: '300px', width: '400px' }"
             />
             <template #reference>
               <van-field
@@ -99,6 +102,9 @@
         <van-col span="6">
           <van-popover v-model:show="showeDatePopup" placement="bottom-start">
             <van-calendar
+              :lazy-render="false"
+              row-height="25"
+              :max-date="maxDate"
               :show-confirm="false"
               ref="dateeref"
               first-day-of-week="1"
@@ -107,7 +113,7 @@
               :show-title="false"
               :poppable="false"
               @confirm="oneDateConfirm"
-              :style="{ height: '350px', width: '350px' }"
+              :style="{ height: '300px', width: '400px' }"
             />
             <template #reference>
               <van-field
@@ -179,6 +185,9 @@
           </van-field>
           <van-popover v-model:show="showextDatePopup" placement="bottom-start">
             <van-calendar
+              :lazy-render="false"
+              row-height="25"
+              :max-date="maxDate"
               ref="dateextref"
               type="multiple"
               title="日历"
@@ -187,7 +196,7 @@
               first-day-of-week="1"
               :poppable="false"
               @confirm="onexConfirm"
-              :style="{ height: '350px', width: '350px' }"
+              :style="{ height: '350px', width: '400px' }"
             />
             <template #reference>
               <van-field
@@ -269,7 +278,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from 'vue'
+import { defineComponent, watch, ref } from 'vue'
 import { Col, Row, Button, Checkbox, RadioGroup, Radio, Divider } from 'vant'
 import { Form, Field, CellGroup } from 'vant'
 import { Cell, Calendar, Popover } from 'vant'
@@ -277,8 +286,6 @@ import { DatetimePicker, Toast } from 'vant'
 import type { CalendarInstance } from 'vant'
 
 import Clipboard from 'clipboard'
-
-import { ref } from 'vue'
 
 import { MAPVERSION, DEFAULTVALUE } from './config/config'
 import dayjs from 'dayjs'
@@ -293,6 +300,9 @@ const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 const S_DATE_TIME_FORMAT = 'YYYY-MM-DD'
 
 const today = dayjs().utcOffset(0).format(DATE_TIME_FORMAT)
+//最大选择日期
+const maxDate = dayjs().add(1, 'year').toDate()
+//const maxDate = new Date(2024, 1, 4)
 
 export default defineComponent({
   components: {
@@ -732,7 +742,8 @@ export default defineComponent({
       resetSQL,
       resetALL,
       cdailyradio,
-      hideextdate
+      hideextdate,
+      maxDate
     }
   }
 })
