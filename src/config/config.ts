@@ -14,14 +14,14 @@ interface dtype {
 }
 const MAPVERSION: mapversiontype = {
   HK: {
-    version1: '20200721',
-    version2: '20210617',
+    version1: '20210617',
+    version2: '20221212',
     memo_zh: '臨時封閉',
     memo_en: 'temporarily closed'
   },
   MO: {
-    version1: '20200918',
-    version2: '20210714',
+    version1: '20210714',
+    version2: '20230113',
     memo_zh: '封閉交通',
     memo_en: ''
   }
