@@ -14,8 +14,8 @@ interface dtype {
 }
 const MAPVERSION: mapversiontype = {
   HK: {
-    version1: '20210617',
-    version2: '20221212',
+    version1: '20221212',
+    version2: '20231222',
     memo_zh: '臨時封閉',
     memo_en: 'temporarily closed'
   },
