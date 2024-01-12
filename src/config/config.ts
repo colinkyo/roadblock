@@ -20,8 +20,8 @@ const MAPVERSION: mapversiontype = {
     memo_en: 'temporarily closed'
   },
   MO: {
-    version1: '20210714',
-    version2: '20230113',
+    version1: '20230113',
+    version2: '20240104',
     memo_zh: '封閉交通',
     memo_en: ''
   }
